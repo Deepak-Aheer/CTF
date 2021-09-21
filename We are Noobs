@@ -4,7 +4,7 @@ Here's the Walkthrough of the CTF "We Are Noobs"
 SCAN THE HOST using NMAP
 ______________________________________________________________________________________
 
-nmap -sSCV -p- 192.168.169.134
+$ nmap -sSCV -p- 192.168.169.134
             -sS : TCP SYN Scan type
             -sC : Performs a script scan using the default set of scripts.
             -sV : Probe open ports to determine service/version info
@@ -51,7 +51,7 @@ LOOKING AT FTP SERVICE, WE CAN SEE THAT 'anonymous login' IS ALLWOED.
 TRY exploiting THAT.
 _______________________________________________________________
 
-ftp 192.168.169.134
+$ ftp 192.168.169.134
 '''
 Connected to 192.168.169.134.
 220 (vsFTPd 3.0.3)
@@ -95,7 +95,7 @@ ftp>
 __________________________
 READ THOSE FILES
 __________________________
-cat welcome
+$ cat welcome
 '''
  
                         🙏 WELCOME 🙏
@@ -106,7 +106,7 @@ cat welcome
 
 '''
 
-cat cred.txt
+$ cat cred.txt
 '''
 Y2hhbXA6cGFzc3dvcmQ=
 '''
@@ -116,7 +116,7 @@ __________________________________________
  TRY DECODING THE STRING
 ___________________________________________
 
-base64 --decode cred.txt
+$ base64 --decode cred.txt
 '''
 champ:password
 '''
@@ -133,9 +133,198 @@ THERE WERE 2 OTHER SERVICES RUNNING
 LET'S HAVE A LOOK AT http SERVICE
 __________________________________________
 
-![image](https://user-images.githubusercontent.com/37577726/134231618-b30b51ff-e511-4c93-b358-c4c4f37af604.png)
-
+https://user-images.githubusercontent.com/37577726/134231618-b30b51ff-e511-4c93-b358-c4c4f37af604.png
 __________________________________________
 
 HERE WE CAN SEE A login FIELD.
 TRY LOGGING IN USING the username & passwrod
+
+https://user-images.githubusercontent.com/37577726/134234237-f07b30fb-3a74-4b0a-96d4-55afe2966a1d.png
+___________________________________________
+
+EXPLORE ALL THE OPTIONS AVAILABLE THERE
+
+EVENTUALLY WE'LL FIND A rar FILE
+DOWNLOAD AND EXTRACT IT & SEE WHAT WE'VE GOT.
+
+WE CAN SEE THAT THERE ARE 3 FILES, 1 text file and 2 are iamges.
+
+$ ls
+'''
+funny.bmp  funny.jpg  sudo
+'''
+$ cat sudo
+'''
+Did you notice the file name? Isn't is interesting?
+'''
+
+THE IMAGES ARE EXACTLY SAME IN LOOKS BUT PROPERTIES ARE DIFFERENT!!
+
+WHAT WE CAN GET FROM AN IMAGE?
+MAYBE SOME USEFUL TEXTS!!
+LET'S CHECK.
+
+CHECK IF THE IMAGES CONTAIN ANYTHING HIDDEN.
+___________________________________
+
+$ steghide --info funny.jpg
+'''
+"funny.jpg":
+  format: jpeg
+  capacity: 2.5 KB
+Try to get information about embedded data ? (y/n) y
+Enter passphrase: 
+  embedded file "hint.py":
+    size: 93.0 Byte
+    encrypted: rijndael-128, cbc
+    compressed: yes
+'''
+_____________________________________
+
+NOW EXTRACT THE ANOTHER IMAGE & SEE WHAT CAN BE FOUND.
+_____________________________________
+
+$ steghide extract -sf funny.jpg
+'''
+Enter passphrase: 
+wrote extracted data to "hint.py".
+'''
+
+$ cat hint.py
+'''
+This is_not a python file but you are revolving around.
+well, try_ to rotate some words too.
+'''
+______________________________________
+
+I THINK THE hint IS ENOUGH
+
+https://rot13.com/
+
+use this website to get the desired output
+
+WE'LL GET SOMETHING USEFUL.
+
+REMEMBER THE services WE FOUND RUNNING ON SERVER
+__________________________________________________
+
+
+$ ssh username@192.168.169.134 -p port_number
+'''
+username@192.168.169.134's password: 
+
+Welcome to Ubuntu 18.04.5 LTS (GNU/Linux 4.15.0-154-generic x86_64)
+
+*** System restart required ***
+Last login: Tue Sep 21 16:23:23 2021
+ _______________________________________
+/ Your mode of life will be changed for \
+\ the better because of good news soon. /
+ ---------------------------------------
+   \
+    \
+        .--.
+       |o_o |
+       |:_/ |
+      //   \ \
+     (|     | )
+    /'\_   _/`\
+    \___)=(___/
+
+username@wtf:~$ 
+'''
+__________________________________________
+
+NOW WE'RE INTO THE SYSTEM
+
+JUST LOOK FOR WHAT WE'RE FINDING 
+
+ONE file WILL CONTAIN THE user FLAG
+
+NOW WE'VE TO FIND THE root FLAG
+SO WE'LL SEARCH FOR IT BUT WOULDN'T GET IT BECAUSE IT'S NOT THERE
+NOW????
+THE root FLAG GENERALLY STORED IN THE root ACCOUNT
+
+SO TRY TO FIND THE root FLAG I /root DIRECTORY
+
+
+BUT!!!!!
+
+THE CURRENT USER MAYNOT BE ABLE TO ACCESS THE /root DIRECTORY
+BUT ANY OTHER USER MIGHT BE ABLE TO ACCESS IT.
+
+LET'S TRY TO LOGIN AS ANOTHER USER BUT WHERE'S THE username & password FOR THAT!!!
+
+LOOK EVERY SINGLE FILE PRESENT ON THE SYSTEM.
+
+WE'LL FIND A BACKUP FILE i.e. backup.sh
+IT MIGHT BE USED TO LOGIN AS OTHER USER!!
+
+NO?
+YES. WELL, ANALYZE THE SCRIPT
+
+HURRAY!!!
+WE'VE GOT THE username & password
+
+LOGIN USING THE CREDENTIALS. & LOOK FOR THE root FLAG.
+
+AGAIN LOOK FOR ALL THE FILES PRESENT ON THE SYSTEM.
+
+n00b@wtf:~$ pwd
+'''
+/var/www/rooot
+'''
+n00b@wtf:~$ cd /home
+n00b@wtf:/home$ ls
+'''
+rooot  wtf
+'''
+n00b@wtf:/home$ cd rooot
+n00b@wtf:/home/rooot$ ls
+'''
+flag.txt
+'''
+________________________________________________________
+
+USE THE GIVEN FILE AND IT'S DATA TO PROCESS FURTHER
+
+NOTHING????
+WELL, WE'VE GOT A SMALL HINT.
+
+THE FLAG IS root flag. SO IT MUST BE INSIDE THE /root DIRECTORY
+
+BUT WE CAN'T ACCESS IT BECAUSE WE'RE NOT A root USER YET AND IT REQUIRES HIGH PRIVILEGES.
+TRY TO ESCALATE privileges.
+
+LOOK FOR ANY SERVICE WHICH COULD HELP IN ESCALATING PRIVILEGES.
+__________________________________________________________________________________
+
+$ sudo -l
+'''
+Matching Defaults entries for n00b on wtf:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User n00b may run the following commands on wtf:
+    (root) NOPASSWD: /bin/nano
+    
+'''
+___________________________________________________________________________________
+
+WOW!!!!
+
+USE https://gtfobins.github.io/gtfobins/nano/#sudo TO SEE PRIVILEGE ESCALATION exploiting THE nano SERVICE.
+
+GOT THE SHELL?
+CHECK THE USERNAME AND OTHER INFO 
+_________
+#id
+_________
+
+WE'RE root NOW!!!
+
+GET THE root FLAG & SUBMIT IT.
+
+                                    thank YOU
+
