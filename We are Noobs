@@ -122,7 +122,7 @@ champ:password
 '''
 ____________________________________________
 
-YOU'VE GOT A USERNAME & PASSWORD
+WE'VE GOT A USERNAME & PASSWORD
 NOW THINK WHERE IT COULD BE USED.
 
 Remember!!  THE nmap RESULTS.
@@ -131,6 +131,11 @@ THERE WERE 2 OTHER SERVICES RUNNING
 2) SSH
 
 LET'S HAVE A LOOK AT http SERVICE
+__________________________________________
+
+![image](https://user-images.githubusercontent.com/37577726/134231618-b30b51ff-e511-4c93-b358-c4c4f37af604.png)
 
 __________________________________________
-https://user-images.githubusercontent.com/37577726/134231618-b30b51ff-e511-4c93-b358-c4c4f37af604.png
+
+HERE WE CAN SEE A login FIELD.
+TRY LOGGING IN USING the username & passwrod
